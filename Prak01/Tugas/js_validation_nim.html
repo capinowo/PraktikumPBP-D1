@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Form Tambah Data Produk</title>
+        <script>
+
+            // Meng-generate kode Captcha
+            // Menyimpan kode Captcha yang harus diisikan
+            let captchaCode = '';
+            // Fungsi untuk meng-generate kode Captcha
+            function generateCaptcha() {
+                const length = 5;
+                let captcha = '';
+                for (let i = 0; i < length; i++) {
+                    const randomCharCode = Math.random() < 0.5
+                        ? Math.floor(Math.random() * (90 - 65 + 1)) + 65 : Math.floor(Math.random() * (122 - 97 + 1)) + 97; 
+                    captcha += String.fromCharCode(randomCharCode);
+                }
+                // Mengisikan value Captcha ke kotak untuk ditampilkan
+                captchaCode = captcha; 
+                // Validasi apakah kode Captcha yang dimasukkan sesuai
+                document.getElementById('captchaText').value = captcha;
+            }
+            // Meng-generate Captcha ketika window terbuka
+            window.onload = generateCaptcha;
+
+            // Validasi input yang dimasukkan ke form
+            function validateForm() {
+                // Mengecek apakah semua input valid
+                let isValid = true;
+                //Mengecek apakah input tiap-tiap kolom valid sesuai dengan syarat
+                let namaProduk = document.getElementById("namaProduk").value;
+                let deskripsi = document.querySelector('textarea[name="deskripsi"]').value;
+                let kategori = document.getElementById("kategori").value;
+                let subKategori = document.getElementById("subKategori").value;
+                let hargaSatuan = document.getElementById("hargaSatuan").value;
+                let grosir = document.querySelector('input[name="Grosir"]:checked');
+                let hargaGrosir = document.getElementById("hargaGrosir").value;
+                let jasaKirim = document.querySelectorAll('input[name="JasaKirim"]:checked');
+                let captchaInput = document.querySelector('input[name="captchaInput"]').value;
+
+                // Syarat validasi Nama Produk 
+                if (namaProduk == "" || namaProduk.length < 5 || namaProduk.length > 30) {
+                    document.getElementById('errorNamaProduk').innerText = "Nama produk harus diisi antara 5 hingga 30 karakter.";
+                    isValid = false;
+                } else {
+                    document.getElementById('errorNamaProduk').innerText = "";
+                }
+
+                // Syarat validasi Deskripsi
+                if (deskripsi == "" || deskripsi.length < 5 || deskripsi.length > 100) {
+                    document.getElementById('errorDeskripsi').innerText = "Deskripsi harus diisi antara 5 hingga 100 karakter.";
+                    isValid = false;
+                } else {
+                    document.getElementById('errorDeskripsi').innerText = "";
+                }
+                // Syarat validasi Kategori
+                if (kategori == "") {
+                    document.getElementById('errorKategori').innerText = "Kategori harus dipilih.";
+                    isValid = false;
+                } else {
+                    document.getElementById('errorKategori').innerText = "";
+                }
+                // Syarat validasi Sub Kategori
+                if (subKategori == "") {
+                    document.getElementById('errorSubKategori').innerText = "Sub Kategori harus dipilih.";
+                    isValid = false;
+                } else {
+                    document.getElementById('errorSubKategori').innerText = "";
+                }
+                // Syarat validasi Harga Satuan
+                if (isNaN(hargaSatuan) || hargaSatuan == "") {
+                    document.getElementById('errorHargaSatuan').innerText = "Harga satuan harus diisi dengan nilai numerik.";
+                    isValid = false;
+                } else {
+                    document.getElementById('errorHargaSatuan').innerText = "";
+                }
+                // Syarat validasi Grosir dan Harga Grosir
+                if (grosir && grosir.value == "Ya" && (isNaN(hargaGrosir) || hargaGrosir == "")) {
+                    document.getElementById('errorHargaGrosir').innerText = "Harga grosir harus diisi dengan nilai numerik.";
+                    isValid = false;
+                } else if (grosir && grosir.value == "Tidak") {
+                    document.getElementById("hargaGrosir").value = ""; 
+                    document.getElementById('errorHargaGrosir').innerText = "";
+                }
+                // Syarat validasi Jasa Kirim
+                if (jasaKirim.length < 3) {
+                    document.getElementById('errorJasaKirim').innerText = "Minimal pilih 3 jasa kirim.";
+                    isValid = false;
+                } else {
+                    document.getElementById('errorJasaKirim').innerText = "";
+                }
+                // Syarat validasi Captcha
+                if (captchaInput != captchaCode) {
+                    document.getElementById('errorCaptcha').innerText = "Captcha yang dimasukkan salah.";
+                    isValid = false;
+                } else {
+                    document.getElementById('errorCaptcha').innerText = "";
+                }
+                // Jika seluruh input valid, maka akan muncul Alert bahwa penambahan produk berhasil
+                if (isValid) {
+                    alert("Penambahan Data Produk Berhasil");
+                    // Setelah penambahan produk berhasil, form akan di-reset
+                    document.getElementById("form").reset();
+                    // Captcha akan di-generate ulang
+                    generateCaptcha(); 
+                }
+                return isValid;
+            }
+
+            // Menu option untuk sub-kategori
+            function updateSubKategori() {
+                const kategori = document.getElementById("kategori").value;
+                const subKategori = document.getElementById('subKategori');
+                subKategori.innerHTML = '<option value=""   Pilih Sub Kategori   /option>';
+
+                // Pilihan yang tersedia
+                let options = [];
+                if (kategori == 'Baju') {
+                    options = ['Baju Pria', 'Baju Wanita', 'Baju Anak'];
+                } else if (kategori == 'Elektronik') {
+                    options = ['Mesin Cuci', 'Kulkas', 'AC'];
+                } else if (kategori == "Alat Tulis") {
+                    options = ['Kertas', 'Map', 'Pulpen'];
+                }
+                // Meng-append sub kategori
+                options.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    subKategori.appendChild(opt);
+                });
+            }
+
+            // Meng-generate ulang Captcha ketika di-reset
+            function handleReset() {
+                generateCaptcha(); 
+            }
+        </script>
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="header">
+                <h2>Form Tambah Data Produk</h2>
+                <form class="form" id="form" onsubmit="return validateForm()" onreset="handleReset()">
+                    <table>
+                        <tr>
+                            <!-- Form Nama Produk-->
+                            <td><label>Nama Produk :</label></td>
+                            <td>
+                                <input type="text" id="namaProduk">
+                                <div id="errorNamaProduk" style="color:red;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!-- Form Deskripsi-->
+                            <td><label>Deskripsi :</label></td>
+                            <td>
+                                <textarea name="deskripsi"></textarea>
+                                <div id="errorDeskripsi" style="color:red;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!-- Form Kategori-->
+                            <td><label>Kategori :</label></td>
+                            <td>
+                                <select id="kategori" name="kategori" onchange="updateSubKategori()">
+                                    <option value="">   Pilih Kategori   </option>
+                                    <option value="Baju">Baju</option>
+                                    <option value="Elektronik">Elektronik</option>
+                                    <option value="Alat Tulis">Alat Tulis</option>
+                                </select>
+                                <div id="errorKategori" style="color:red;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!-- Form Subkategori-->
+                            <td><label>Sub Kategori:</label></td>
+                            <td>
+                                <select id="subKategori" name="subKategori">
+                                    <option value="">  Pilih Subkategori  </option>
+                                </select>
+                                <div id="errorSubKategori" style="color:red;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!-- Form Harga Satuan-->
+                            <td><label>Harga Satuan :</label></td>
+                            <td>
+                                <input type="text" id="hargaSatuan">
+                                <div id="errorHargaSatuan" style="color:red;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!-- Form isGrosir-->
+                            <td><label>Grosir ?</label></td>
+                            <td>
+                                <input type="radio" name="Grosir" id="Ya" value="Ya"> Ya
+                                <input type="radio" name="Grosir" id="Tidak" value="Tidak"> Tidak
+                            </td>
+                        </tr>
+                        <tr>
+                            <!-- Form Harga Grosir-->
+                            <td><label>Harga Grosir :</label></td>
+                            <td>
+                                <input type="text" id="hargaGrosir">
+                                <div id="errorHargaGrosir" style="color:red;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!-- Form opsi Jasa Kirim-->
+                            <td><label>Jasa Kirim :</label></td>
+                            <td>
+                                <div>
+                                    <input type="checkbox" name="JasaKirim" id="JNE"> JNE
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="JasaKirim" id="JNT"> TIKI
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="JasaKirim" id="SiCepat"> SiCepat
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="JasaKirim" id="AnterAja"> NinjaExpress
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="JasaKirim" id="Wahana"> Wahana
+                                </div>
+                                <div id="errorJasaKirim" style="color:red;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!-- Form Captcha-->
+                            <td><label>Captcha :</label></td>
+                            <td>
+                                <input type="text" id="captchaText" name="captchaText" readonly>
+                                <input type="text" name="captchaInput" placeholder="Masukkan captcha">
+                                <div id="errorCaptcha" style="color:red;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <!-- Tombol Submit dan Reset -->
+                                <button type="submit">Submit</button>
+                                <button type="reset">Reset</button>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
